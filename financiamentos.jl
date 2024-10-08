@@ -1,24 +1,28 @@
+using Printf
+
 struct Cliente
     CPF::String
     nome::String
     renda::Float64
 end
 
-function simular_financiamento(prazo::Int, valor_inicial::Float64, taxa_juros::Float64)
+function simular_financiamento(prazo::Int, valor_inicial::Float64, taxa_juros::Float64, valor_entrada::Float64)
     if prazo < 1
-        error("O prazo deve ser positivo, e maior ou igual à 1")
+        error("O prazo deve ser positivo e maior ou igual a 1")
     end
     if taxa_juros < 0 
-        error("O juros não pode ser negativo")
+        error("A taxa de juros não pode ser negativa")
     end
 
-    juros_totais = valor_inicial * taxa_juros * (prazo/12)
-    valor_total = valor_inicial + juros_totais
-    valor_mensal = valor_total / prazo
-    println("O valor total sera de ", valor_total, " reais")
-    println("O valor pago mensalmente será de ", valor_mensal, " reais")
+    #Calculo do juros e parcela mensal de acordo com a formula usada pelo banco central
+    taxa_juros_decimal = taxa_juros / 100  
+    parcela_mensal = ((valor_inicial - valor_entrada) * taxa_juros_decimal * (1 + taxa_juros_decimal)^prazo) / ((1 + taxa_juros_decimal)^prazo - 1)
+    valor_total = parcela_mensal * prazo
+    juros_total = valor_total - valor_inicial
+
+    @printf("O valor total será de %.2f reais\n", valor_total)
+    @printf("O valor pago mensalmente será de %.2f\n", parcela_mensal)
+    @printf("O valor do juros pago é de %.2f\n", juros_total)
 end
 
-# function solicitar_financiamento(Cliente, prazo::int, valor::Float64, taxa_juros::Float64)
-# end
-simular_financiamento(24, 12000.0, 0.02)
+simular_financiamento(24, 12000.0, 2.0, 1000.0)  # 2% ao mês
