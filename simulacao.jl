@@ -28,8 +28,11 @@ function simular_financiamento(prazo::Int, valor_inicial::Float64, taxa_juros::F
     if (validacao=validar_cliente(renda_cliente, parcela_mensal) == 1) 
         return 1
     end
-    # @printf("O valor total será de %.2f reais\n", valor_total)
-    # @printf("O valor pago mensalmente será de %.2f\n", parcela_mensal)
-    # @printf("O valor do juros pago é de %.2f\n", juros_total)
+   
     return valor_total, parcela_mensal, juros_total
 end
+
+#total, parcela, juros = simular_financiamento(24, 12000.0, 2.0, 1000.0)  # 2% ao mês
+#@printf("O valor total será de %.2f reais\n", total)
+#@printf("O valor pago mensalmente será de %.2f\n", parcela)
+#@printf("O valor do juros pago é de %.2f\n", juros)
