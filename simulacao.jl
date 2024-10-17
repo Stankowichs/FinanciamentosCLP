@@ -3,19 +3,18 @@ using Printf
 function validar_cliente(renda::Float64, parcela::Float64)
     if parcela > (renda * 0.3)
         error("A parcela deve ser menor ou igual a 30% da renda do cliente\n")
-        return 1
+        return false
     end
-    return 0
+    
+    return true
 end 
  
 function simular_financiamento(prazo::Int, valor_inicial::Float64, taxa_juros::Float64, valor_entrada::Float64, renda_cliente::Float64)
     if prazo < 1
         error("O prazo deve ser positivo e maior ou igual a 1\n")
-        return 1
     end
     if taxa_juros < 0
         error("A taxa de juros não pode ser negativa\n")
-        return 1
     end
 
     #Calculo do juros e parcela mensal de acordo com a formula usada pelo banco central
@@ -24,10 +23,6 @@ function simular_financiamento(prazo::Int, valor_inicial::Float64, taxa_juros::F
     parcela_mensal = (valor_bruto * taxa_juros_decimal * (1 + taxa_juros_decimal)^prazo) / ((1 + taxa_juros_decimal)^prazo - 1)
     valor_total = parcela_mensal * prazo
     juros_total = valor_total - valor_bruto
-    
-    if (validacao=validar_cliente(renda_cliente, parcela_mensal) == 1) 
-        return 1
-    end
    
     return valor_total, parcela_mensal, juros_total
 end
