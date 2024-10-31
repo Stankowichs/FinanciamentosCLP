@@ -4,6 +4,7 @@ using LibPQ
 conn = LibPQ.Connection("host=localhost dbname=financiamentos user=postgres password=736904")
 
 function acompanhar_financiamento(CPF_cliente::String)
+    CPF_cliente = execute(conn, "SELECT CPF FROM clientes WHERE CPF = '$CPF_cliente'")
     if isempty(CPF_cliente)
         return "CPF inválido"
     end
@@ -12,7 +13,7 @@ function acompanhar_financiamento(CPF_cliente::String)
     query = raw"""
     SELECT c.nome, c.cpf, f.valor_solicitado, f.prazo, f.taxa_juros, f.valor_parcela, f.data_inicio, f.data_termino, f.status
     FROM clientes c
-    JOIN financiamentos f ON c.id_cliente = f.id_cliente
+    JOIN financiamentos_atuais f ON c.id_cliente = f.id_cliente
     WHERE c.cpf = $1
     """
 
@@ -20,7 +21,7 @@ function acompanhar_financiamento(CPF_cliente::String)
     result = execute(conn, query, [CPF_cliente])
     
     if isempty(result)
-        return "Cliente não possui financiamento ou não foi encontrado."
+        return "Cliente não possui financiamento"
     end
 
     # imprime o resultado do financiamento do cliente
