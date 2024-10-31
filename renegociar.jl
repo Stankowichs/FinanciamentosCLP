@@ -32,8 +32,7 @@ function renegociar(id_cliente::Int, novos_juros::Float64, novo_prazo::Int, nova
     if (meses_atraso == 0) 
         # verificar se a renda do cliente diminuiu, se nao, nao renegociar
         if (renda_cliente <= nova_renda)
-            println("Seu perfil nao atende as condicoes de renegociacao!")
-            return 0
+            return "Seu perfil nao atende as condicoes de renegociacao!"
         end
     end
     
