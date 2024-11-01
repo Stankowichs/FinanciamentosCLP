@@ -12,8 +12,6 @@ end
 function requisitar(prazo::Int, valor_solicitado::Float64, valor_entrada::Float64, CPF_cliente::String, tipo_financiamento::String)
     # Verificar se o CPF existe no banco de dados
     cpf_result = execute(conn, "SELECT CPF FROM clientes WHERE CPF = '$CPF_cliente' ")
-    cpf_cliente = cpf_result[1, 1]
-    println(cpf_result)
     if isempty(cpf_result)
         return "CPF inválido"
     end
