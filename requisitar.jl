@@ -33,8 +33,7 @@ function requisitar(prazo::Int, valor_solicitado::Float64, valor_entrada::Float6
 
     # Calcular o valor do financiamento e a parcela mensal
     valor_financiamento = valor_solicitado - valor_entrada
-    prazo_meses = prazo * 12  # assumindo que o prazo está em anos
-    parcela_mensal = (valor_financiamento * taxa_juros_decimal * (1 + taxa_juros_decimal)^prazo_meses) / ((1 + taxa_juros_decimal)^prazo_meses - 1)
+    parcela_mensal = (valor_financiamento * taxa_juros_decimal) / (1 - (1 + taxa_juros_decimal)^(-prazo))
 
     # Obter a renda do cliente para validação
     renda_result = execute(conn, "SELECT renda FROM clientes WHERE CPF = '$CPF_cliente' ")
@@ -47,6 +46,7 @@ function requisitar(prazo::Int, valor_solicitado::Float64, valor_entrada::Float6
 
     montante_total = parcela_mensal * prazo
     status = "Aprovado"
+    
     #Inserir a requisição no banco de dados, se aprovada
     execute(conn, """
         INSERT INTO financiamentos_atuais (CPF_cliente, valor_solicitado, valor_entrada, prazo, tipo_financiamento, taxa_juros, valor_parcela, status, montante_total, meses_em_atraso, saldo_devedor)
