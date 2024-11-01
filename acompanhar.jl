@@ -4,38 +4,45 @@ using LibPQ
 conn = LibPQ.Connection("host=localhost dbname=financiamentos user=postgres password=736904")
 
 function acompanhar_financiamento(CPF_cliente::String)
-    CPF_cliente = execute(conn, "SELECT CPF FROM clientes WHERE CPF = '$CPF_cliente'")
-    if isempty(CPF_cliente)
+    # Verificar se o CPF existe no banco de dados
+    cpf_result = execute(conn, "SELECT CPF FROM clientes WHERE CPF = '$CPF_cliente' ")
+    if isempty(cpf_result)
         return "CPF inválido"
     end
 
-    # comandos sql de junção da tabela financiamentos e clientes
+    # Extrair o valor do CPF da consulta
+    cpf = cpf_result[1, 1]  # Acessa a primeira linha e primeira coluna
+
+    # Consulta SQL de junção das tabelas financiamentos e clientes
     query = raw"""
-    SELECT c.nome, c.cpf, f.valor_solicitado, f.prazo, f.taxa_juros, f.valor_parcela, f.data_inicio, f.data_termino, f.status
+    SELECT c.nome, c.cpf, f.valor_solicitado, f.prazo, f.taxa_juros, f.valor_parcela, f.status, f.montante_total, f.saldo_devedor, f.tipo_financiamento 
     FROM clientes c
-    JOIN financiamentos_atuais f ON c.id_cliente = f.id_cliente
+    JOIN financiamentos_atuais f ON c.cpf = f.cpf_cliente
     WHERE c.cpf = $1
     """
 
-    # cpf como parametro para a busca 
-    result = execute(conn, query, [CPF_cliente])
-    
-    if isempty(result)
+    # Executar a consulta com CPF como parâmetro
+    result_cpf = execute(conn, "SELECT cpf_cliente FROM financiamentos_atuais WHERE cpf_cliente = '$CPF_cliente' ")
+    if isempty(result_cpf)
         return "Cliente não possui financiamento"
     end
-
-    # imprime o resultado do financiamento do cliente
+    
+    # Imprimir o resultado do financiamento do cliente
+    result = execute(conn, query, [cpf])
     for row in result
-        println("Nome: $(row[:nome]), CPF: $(row[:cpf])")
-        println("Valor Solicitado: $(row[:valor_solicitado]), Prazo: $(row[:prazo]) meses, Taxa de Juros: $(row[:taxa_juros])%")
-        println("Valor da Parcela: $(row[:valor_parcela]), Data Início: $(row[:data_inicio]), Data Término: $(row[:data_termino])")
-        println("Status do Financiamento: $(row[:status])")
+        println("Nome: $(row[1]), CPF: $(row[2])")
+        println("Valor Solicitado: $(row[3]), Prazo: $(row[4]) meses, Taxa de Juros: $(row[5])% a.m")
+        println("Tipo do financiamento: $(row[10])")
+        println("Valor da Parcela: $(row[6])")
+        println("Status do Financiamento: $(row[7])")
+        println("Total a ser pago: $(row[8]), Saldo devedor: $(row[9])")
     end
+    return "Consulta concluída"
 end
 
 # Chamando a função com um CPF de exemplo
-resultado = acompanhar_financiamento("1234567890")
+resultado = acompanhar_financiamento("0987654321")
 println(resultado)
 
-# Fechando a conexão com o banco de dados
+# Fechar a conexão com o banco de dados
 close(conn)
