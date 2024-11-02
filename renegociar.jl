@@ -1,5 +1,4 @@
 using LibPQ
-using Dates
 
 # Conexão com o banco de dados
 conn = LibPQ.Connection("host=localhost dbname=financiamentos user=postgres password=Emnlefn01")
@@ -16,18 +15,12 @@ function calcular_parcela(taxa_juros::Float64, valor_bruto::Float64, prazo::Int)
     return parcela_mensal, valor_total
 end
 
-function calcularData(data_antiga::String, prazo::Int)
-    data_antiga + month(prazo)
-end
-
 # renegociar (novas condicoes)  --- as novas condicoes envolvem taxa de juros e prazo para pagar
-function renegociar(id_cliente::Int, novos_juros::Float64, novo_prazo::Int, nova_renda::Float64)
-    # pegar os dados do cliente
-    id_cliente = execute(conn, "SELECT id_clientes FROM clientes WHERE CPF = '$id_cliente' ")
+function renegociar(cpf_cliente::String, novos_juros::Float64, novo_prazo::Int, nova_renda::Float64)
 
     # verificar se ha nao ha meses em atraso, se sim, nao renegociar
-    meses_atraso = execute(conn, "SELECT meses_em_atraso FROM financiamentos_atuais WHERE id_clientes = '$id_cliente' ")
-    renda_cliente = execute(conn, "SELECT renda FROM clientes WHERE id_clientes = '$id_cliente' ")
+    meses_atraso = execute(conn, "SELECT meses_em_atraso FROM financiamentos_atuais WHERE cpf_cliente = '$cpf_cliente' ")
+    renda_cliente = execute(conn, "SELECT renda FROM clientes WHERE cpf = '$cpf_cliente' ")
 
     if (meses_atraso == 0) 
         # verificar se a renda do cliente diminuiu, se nao, nao renegociar
@@ -36,39 +29,39 @@ function renegociar(id_cliente::Int, novos_juros::Float64, novo_prazo::Int, nova
         end
     end
     
-    saldo_devedor = execute(conn, "SELECT saldo_devedor FROM financiamentos_atuais WHERE id_clientes = '$id_cliente' ")
-    montante_atual = execute(conn, "SELECT montante_total FROM financiamentos_atuais WHERE id_clientes = '$id_cliente' ")
+    saldo_devedor_result = execute(conn, "SELECT saldo_devedor FROM financiamentos_atuais WHERE cpf_cliente = '$cpf_cliente' ")
+    saldo_devedor = Float64(saldo_devedor_result[1, 1])
+    montante_atual_result = execute(conn, "SELECT montante_total FROM financiamentos_atuais WHERE cpf_cliente = '$cpf_cliente' ")
+    montante_atual = Float64(montante_atual_result[1, 1])
     
     #calcular nova parcela
-    result = calcular_parcela(novos_juros, saldo_devedor, novo_prazo)
-
-    nova_parcela = result[0]
-    novo_montante = result[1]
+    nova_parcela, novo_montante = calcular_parcela(novos_juros, saldo_devedor, novo_prazo)
 
     # Validação do cliente
     if !validar_cliente(nova_renda, nova_parcela)
         return "Cliente não aprovado para o financiamento"
     end
 
-    #calculo da data com novo prazo
-    data_antiga = execute(conn, "SELECT data_termino FROM financiamentos_atuais WHERE id_clientes = '$id_clientes'")
-    nova_data = calcularData(Date(data_antiga), novo_prazo)
-
     # calculo do novo saldo devedor
     total_pago = montante_atual - saldo_devedor
     saldo_devedor = novo_montante - total_pago
 
     # dar update na renda do cliente
-    execute(conn, "UPDATE clientes SET renda = '$nova_renda' WHERE id_clientes = '$id_cliente'")
+    execute(conn, "UPDATE clientes SET renda = '$nova_renda' WHERE cpf = '$cpf_cliente'")
 
     # dar update das novas condicoes
     execute(conn, "UPDATE financiamentos_atuais SET prazo = '$novo_prazo', taxa_juros = '$novos_juros', 
     valor_parcela = '$nova_parcela', 
-    data_termino = '$nova_data',
     montante_total = '$novo_montante',
     saldo_devedor = '$saldo_devedor',
     meses_em_atraso = 0
-    WHERE id_clientes = '$id_cliente'")
+    WHERE cpf_cliente = '$cpf_cliente'")
 
     return 1
+end
+
+if renegociar("123456789", 1.8, 42, 25000.00) == 1
+    println("Renegociacao feita com sucesso!")
+else 
+    println("Renegociacao negada!")
 end
