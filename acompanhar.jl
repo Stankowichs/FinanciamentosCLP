@@ -1,17 +1,15 @@
 using LibPQ
+using JSON
 
 # Conexão com o banco de dados
-conn = LibPQ.Connection("host=localhost dbname=financiamentos user=postgres password=736904")
+conn = LibPQ.Connection("host=localhost dbname=financiamentos user=postgres password=Emnlefn01")
 
 function acompanhar_financiamento(CPF_cliente::String)
     # Verificar se o CPF existe no banco de dados
     cpf_result = execute(conn, "SELECT CPF FROM clientes WHERE CPF = '$CPF_cliente' ")
     if isempty(cpf_result)
-        return "CPF inválido"
+        return JSON.json(Dict("erro" => "CPF inválido"))
     end
-
-    # Extrair o valor do CPF da consulta
-    cpf = cpf_result[1, 1]  # Acessa a primeira linha e primeira coluna
 
     # Consulta SQL de junção das tabelas financiamentos e clientes
     query = raw"""
@@ -24,25 +22,33 @@ function acompanhar_financiamento(CPF_cliente::String)
     # Executar a consulta com CPF como parâmetro
     result_cpf = execute(conn, "SELECT cpf_cliente FROM financiamentos_atuais WHERE cpf_cliente = '$CPF_cliente' ")
     if isempty(result_cpf)
-        return "Cliente não possui financiamento"
+        return JSON.json(Dict("erro" => "Cliente não possui financiamento"))
     end
     
-    # Imprimir o resultado do financiamento do cliente
-    result = execute(conn, query, [cpf])
+    # Criar uma lista para armazenar os resultados
+    resultados = []
+
+    # Adicionar os resultados à lista
+    result = execute(conn, query, [CPF_cliente])
     for row in result
-        println("Nome: $(row[1]), CPF: $(row[2])")
-        println("Valor Solicitado: $(row[3]), Prazo: $(row[4]) meses, Taxa de Juros: $(row[5])% a.m")
-        println("Tipo do financiamento: $(row[10])")
-        println("Valor da Parcela: $(row[6])")
-        println("Status do Financiamento: $(row[7])")
-        println("Total a ser pago: $(row[8]), Saldo devedor: $(row[9])")
+        push!(resultados, Dict(
+            "nome" => row[1],
+            "cpf" => row[2],
+            "valor_solicitado" => row[3],
+            "prazo" => row[4],
+            "taxa_juros" => row[5],
+            "valor_parcela" => row[6],
+            "status" => row[7],
+            "montante_total" => row[8],
+            "saldo_devedor" => row[9],
+            "tipo_financiamento" => row[10]
+        ))
     end
-    return "Consulta concluída"
+
+    # Retornar os resultados como JSON
+    return JSON.json(resultados)
 end
 
-# Chamando a função com um CPF de exemplo
-resultado = acompanhar_financiamento("0987654321")
-println(resultado)
 
 # Fechar a conexão com o banco de dados
 close(conn)
