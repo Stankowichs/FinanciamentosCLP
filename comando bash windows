@@ -1,0 +1,4 @@
+Invoke-WebRequest -Uri "http://localhost:8080/requisitar" `
+                  -Method POST `
+                  -Headers @{"Content-Type"="application/json"} `
+                  -Body '{"prazo": 24, "valor_solicitado": 50000.0, "valor_entrada": 5000.0, "cpf": "12332112332", "tipo_financiamento": "veiculo"}'
