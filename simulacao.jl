@@ -1,41 +1,34 @@
-using LibPQ
+using JSON
 
-# Conexão com o banco de dados
-conn = LibPQ.Connection("host=localhost dbname=financiamentos user=postgres password=736904")
-
-# Função para simular o financiamento
-function simular_financiamento(prazo::Int, valor_inicial::Float64, taxa_juros::Float64, valor_entrada::Float64, CPF_cliente::String)
+# Função de simulação de financiamento
+function simular_financiamento(prazo::Int, valor_inicial::Float64, valor_entrada::Float64, tipo_financiamento::String)
     if prazo < 1
-        return "O prazo deve ser positivo e maior ou igual a 1"
-    end
-    if taxa_juros < 0
-        return "A taxa de juros não pode ser negativa"
+        return JSON.
+        json(Dict("erro" => "O prazo deve ser positivo e maior ou igual a 1"))
     end
 
-    # Consultar a renda do cliente
-    renda_result = execute(conn, "SELECT renda FROM clientes WHERE CPF = '$CPF_cliente' ")
-
-    # Verifica se o cliente foi encontrado e pega a renda
-    if isempty(renda_result)
-        return "Cliente não encontrado."
+    if tipo_financiamento == "imobiliário"
+        taxa_juros = 1.0
+    elseif tipo_financiamento == "estudantil"
+        taxa_juros = 0.3
+    elseif tipo_financiamento == "veiculo"
+        taxa_juros = 1.5
+    elseif tipo_financiamento == "equipamento"
+        taxa_juros = 1.3
+    else
+        return JSON.json(Dict("erro" => "Tipo de financiamento inválido"))
     end
 
-    renda_cliente = renda_result[1, 1]  # Obter a renda do primeiro resultado
-    println("Renda cliente: $(renda_cliente)")
-
-    # Cálculo do juros e parcela mensal
     taxa_juros_decimal = taxa_juros / 100
     valor_bruto = valor_inicial - valor_entrada
     parcela_mensal = (valor_bruto * taxa_juros_decimal * (1 + taxa_juros_decimal)^prazo) / ((1 + taxa_juros_decimal)^prazo - 1)
     valor_total = parcela_mensal * prazo
     juros_total = valor_total - valor_bruto
 
-    return valor_total, parcela_mensal, juros_total
+    return JSON.json(Dict(
+        "valor_total" => valor_total,
+        "parcela_mensal" => parcela_mensal,
+        "juros_total" => juros_total,
+        "tipo_financiamento" => tipo_financiamento
+    ))
 end
-
-# Simulação do financiamento
-resultado = simular_financiamento(2, 10000.0, 1.0, 2000.0, "0987654321")
-println(resultado)
-
-# Fechar a conexão
-close(conn)
