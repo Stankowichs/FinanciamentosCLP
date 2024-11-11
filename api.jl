@@ -2,6 +2,7 @@ using HTTP
 include("acompanhar.jl")
 include("renegociar.jl")
 include("requisitar.jl")
+include("simulacao.jl")
 
 function handle_request(req::HTTP.Request)
     println("Metodo: ", req.method)
@@ -55,6 +56,23 @@ function handle_request(req::HTTP.Request)
         catch e
             println("Erro ao processar requisição: ", e)
             return HTTP.Response(400, "Erro ao processar dados")
+        end
+    elseif req.method == "POST" && req.target == "/simulacao"
+        try
+            data = JSON.parse(body)
+            println("Dados Recebidos: ", data)
+
+            resultado = simular_financiamento(
+                data["prazo"],
+                data["valor_inicial"],
+                data["valor_entrada"],
+                data["tipo_financiamento"]
+            )
+            println("Resultado da Simulação: ", resultado)
+            return HTTP.Response(200, resultado)
+        catch e
+            println("Erro ao processar requisição: ", e)
+            return HTTP.Response(400, JSON.json(Dict("erro" => "Erro ao processar dados")))
         end
     else
         return HTTP.Response(404, "Endpoint não encontrado")
