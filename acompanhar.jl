@@ -22,7 +22,7 @@ function acompanhar_financiamento(CPF_cliente::String)
     # Executar a consulta com CPF como parâmetro
     result_cpf = execute(conn, "SELECT cpf_cliente FROM financiamentos_atuais WHERE cpf_cliente = '$CPF_cliente' ")
     if isempty(result_cpf)
-        return JSON.json(Dict("erro" => "Cliente não possui financiamento"))
+        return JSON.json(Dict("erro" => "Cliente nao possui financiamento"))
     end
     
     # Criar uma lista para armazenar os resultados
@@ -48,7 +48,6 @@ function acompanhar_financiamento(CPF_cliente::String)
     # Retornar os resultados como JSON
     return JSON.json(resultados)
 end
-
 
 # Fechar a conexão com o banco de dados
 close(conn)
