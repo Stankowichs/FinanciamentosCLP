@@ -1,0 +1,65 @@
+---------COMANDO REQUISITAR-----------------------------
+CPF INVALIDO
+Invoke-WebRequest -Uri "http://localhost:8080/requisitar" `
+-Method POST `
+-Headers @{"Content-Type"="application/json"} `
+-Body '{
+    "prazo": 24,
+    "valor_solicitado": 50000.0,
+    "valor_entrada": 5000.0,
+    "cpf": "987654333",
+    "tipo_financiamento": "veiculo"
+}'
+
+Invoke-WebRequest -Uri "http://localhost:8080/requisitar" `
+-Method POST `
+-Headers @{"Content-Type"="application/json"} `
+-Body '{
+    "prazo": 24,
+    "valor_solicitado": 50000.0,
+    "valor_entrada": 5000.0,
+    "cpf": "987654321",
+    "tipo_financiamento": "veiculo"
+}'
+
+Invoke-WebRequest -Uri "http://localhost:8080/requisitar" `
+-Method POST `
+-Headers @{"Content-Type"="application/json"} `
+-Body '{
+    "prazo": 72,
+    "valor_solicitado": 70000.0,
+    "valor_entrada": 0.0,
+    "cpf": "123456789",
+    "tipo_financiamento": "estudantil"
+}'
+
+COMANDO RENEGOCIAR ----------------------------------------
+
+Invoke-WebRequest -Uri "http://localhost:8080/renegociar" `
+-Method POST `
+-Headers @{"Content-Type"="application/json"} `
+-Body '{
+    "cpf": "123456789",
+    "novos_juros": 5.5,
+    "novo_prazo": 24,
+    "nova_renda": 5000.0
+}'
+
+COMANDO SIMULAR ----------------------------------------------
+
+Invoke-WebRequest -Uri "http://localhost:8080/simulacao" `
+-Method POST `
+-Headers @{"Content-Type"="application/json"} `
+-Body '{
+    "prazo": 60,
+    "valor_inicial": 50000.0,
+    "valor_entrada": 5000.0,
+    "tipo_financiamento": "imobiliario"
+}'
+
+
+LINK ACOMPANHAR ----------------------------------------------
+ANDRE
+http://localhost:8080/acompanhar?cpf=123456789
+HUGO
+http://localhost:8080/acompanhar?cpf=987654321
