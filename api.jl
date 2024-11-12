@@ -1,8 +1,10 @@
 using HTTP
+using LibPQ
+using JSON
 include("acompanhar.jl")
 include("renegociar.jl")
 include("requisitar.jl")
-include("simulacao.jl")
+include("simular.jl")
 
 function handle_request(req::HTTP.Request)
     println("Metodo: ", req.method)
@@ -28,7 +30,7 @@ function handle_request(req::HTTP.Request)
     elseif req.method == "POST" && req.target == "/renegociar"
         try
             data = JSON.parse(body)
-            println("Dados Recebidos: ", data)
+            # println("Dados Recebidos: ", data)
 
             resultado = renegociar(data["cpf"], data["novos_juros"], data["novo_prazo"], data["nova_renda"])
             println("Resultado da Renegociação: ", resultado)
@@ -44,7 +46,7 @@ function handle_request(req::HTTP.Request)
     elseif req.method == "POST" && req.target == "/requisitar"
         try
             data = JSON.parse(body)
-            println("Dados Recebidos: ", data)
+            # println("Dados Recebidos requisitar: ", data)
 
             resultado = requisitar(data["prazo"], data["valor_solicitado"], data["valor_entrada"], data["cpf"], data["tipo_financiamento"])
             println("Resultado da Requisição: ", resultado)
@@ -60,7 +62,7 @@ function handle_request(req::HTTP.Request)
     elseif req.method == "POST" && req.target == "/simulacao"
         try
             data = JSON.parse(body)
-            println("Dados Recebidos: ", data)
+            # println("Dados Recebidos: ", data)
 
             resultado = simular_financiamento(
                 data["prazo"],
