@@ -7,7 +7,7 @@ function simular_financiamento(prazo::Int, valor_inicial::Float64, valor_entrada
         json(Dict("erro" => "O prazo deve ser positivo e maior ou igual a 1"))
     end
 
-    if tipo_financiamento == "imobiliário"
+    if tipo_financiamento == "imobiliario"
         taxa_juros = 1.0
     elseif tipo_financiamento == "estudantil"
         taxa_juros = 0.3
