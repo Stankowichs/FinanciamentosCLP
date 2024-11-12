@@ -1,15 +1,16 @@
 using LibPQ
 using JSON
 
-# Conexão com o banco de dados
-conn = LibPQ.Connection("host=localhost dbname=financiamentos user=postgres password=Emnlefn01")
-
 # Função de requisição de financiamento
 function requisitar(prazo::Int, valor_solicitado::Float64, valor_entrada::Float64, CPF_cliente::String, tipo_financiamento::String)
     try
+        # Abrir conexão com o banco de dados
+        conn = LibPQ.Connection("host=localhost dbname=financiamentos user=postgres password=Emnlefn01")
+        
         # Verificar se o CPF existe no banco de dados
         cpf_result = execute(conn, "SELECT CPF FROM clientes WHERE CPF = '$CPF_cliente'")
         if isempty(cpf_result)
+            close(conn)
             return JSON.json(Dict("erro" => "CPF inválido"))
         end
 
@@ -24,6 +25,7 @@ function requisitar(prazo::Int, valor_solicitado::Float64, valor_entrada::Float6
         elseif tipo_financiamento == "equipamento"
             taxa_juros = 1.3
         else
+            close(conn)
             return JSON.json(Dict("erro" => "Tipo de financiamento inválido"))
         end
         taxa_juros_decimal = taxa_juros / 100
@@ -35,16 +37,18 @@ function requisitar(prazo::Int, valor_solicitado::Float64, valor_entrada::Float6
         status = "Aprovado"
         meses_em_atraso = 0
 
-        println("inserindo no banco de dados ", CPF_cliente, " ", valor_solicitado, " ", valor_entrada, " ", prazo, " ", tipo_financiamento, " ", taxa_juros, " ", parcela_mensal, " ", status, " ", montante_total, " ", meses_em_atraso, " ", montante_total)
         # Inserir a requisição no banco de dados, se aprovada
         execute(conn, """
         INSERT INTO financiamentos_atuais (CPF_cliente, valor_solicitado, valor_entrada, prazo, tipo_financiamento, taxa_juros, valor_parcela, status, montante_total, meses_em_atraso, saldo_devedor)
         VALUES ('$CPF_cliente', '$valor_solicitado', '$valor_entrada', '$prazo', '$tipo_financiamento', '$taxa_juros', '$parcela_mensal', '$status', '$montante_total', '$meses_em_atraso', '$montante_total')
     """)
-    println("inserido no banco de dados ", CPF_cliente, " ", valor_solicitado, " ", valor_entrada, " ", prazo, " ", tipo_financiamento, " ", taxa_juros, " ", parcela_mensal, " ", status, " ", montante_total, " ", meses_em_atraso, " ", montante_total)
+    # println("inserido no banco de dados ", CPF_cliente, " ", valor_solicitado, " ", valor_entrada, " ", prazo, " ", tipo_financiamento, " ", taxa_juros, " ", parcela_mensal, " ", status, " ", montante_total, " ", meses_em_atraso, " ", montante_total)
 
-        # Retornar JSON com os detalhes do financiamento
-        return JSON.json(Dict(
+        # Fechar a conexão com o banco de dados
+        close(conn)
+
+        # Criar o JSON de resposta
+        resposta_json = JSON.json(Dict(
             "cpf_cliente" => CPF_cliente,
             "valor_solicitado" => valor_solicitado,
             "valor_entrada" => valor_entrada,
@@ -55,11 +59,16 @@ function requisitar(prazo::Int, valor_solicitado::Float64, valor_entrada::Float6
             "status" => status,
             "montante_total" => montante_total
         ))
+
+        # Imprimir o JSON de resposta
+        # println("JSON de Resposta: ", resposta_json)
+
+        # Retornar o JSON de resposta
+        return resposta_json
     catch e
         println("Erro ao processar requisição: ", e)
+        println("Detalhes do Erro: ", e.message)
         return JSON.json(Dict("erro" => "Erro ao processar requisição"))
     end
 end
-requisitar(24, 50000.0, 5000.0, "12332112332", "veiculo")
-# Fechar a conexão com o banco de dados
-close(conn)
+# requisitar(24, 50000.0, 5000.0, "12332112332", "veiculo")
