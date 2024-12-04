@@ -26,6 +26,7 @@ O OxeBanking é um projeto colaborativo multidisciplinar que abrange diversas li
 - **Estrutura:** Cada funcionalidade, como controle de contas, transações e financiamentos, é desenvolvida em uma linguagem de programação diferente.
 - **Este Módulo:** Utiliza Julia para o controle básico de financiamentos, focando em APIs REST locais e integração com PostgreSQL.
 
+---
 
 ## ⚙️ **Configuração**
 
@@ -42,6 +43,7 @@ O OxeBanking é um projeto colaborativo multidisciplinar que abrange diversas li
 **Desenvolvido por:**  
 
 *Pedro André e Hugo Stankowich Souza*  
+
 ---
 
 **Licença:**  
