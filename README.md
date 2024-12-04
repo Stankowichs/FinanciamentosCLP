@@ -32,6 +32,7 @@ Este módulo não inclui pré-requisitos para a aprovação de financiamentos, g
   ---
 
 **Desenvolvido por:**  
+
 *Pedro André e Hugo Stankowich Souza*  
 ---
 
