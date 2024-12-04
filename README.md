@@ -40,7 +40,7 @@ O OxeBanking é um projeto colaborativo multidisciplinar que abrange diversas li
 
   ---
 
-**Desenvolvido por:**  
+## **Desenvolvido por:**  
 
 *Pedro André e Hugo Stankowich Souza*  
 
