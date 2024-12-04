@@ -27,4 +27,13 @@ Este módulo não inclui pré-requisitos para a aprovação de financiamentos, g
 3. Dependências de Julia:  
    - HTTP.jl  
    - JSON3.jl  
-   - PostgreSQL.jl  
+   - PostgreSQL.jl
+
+  ---
+
+**Desenvolvido por:**  
+*Pedro André e Hugo Stankowich Souza*  
+---
+
+**Licença:**  
+Este projeto é de uso acadêmico e possui finalidade educacional.  
