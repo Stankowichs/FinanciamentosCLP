@@ -19,7 +19,7 @@ Este módulo não inclui pré-requisitos para a aprovação de financiamentos, g
 
 ---
 
-## ⚙️ **Configuração e Execução**
+## ⚙️ **Configuração**
 
 ### Pré-requisitos  
 1. **Julia** (versão 1.8 ou superior)  
@@ -28,9 +28,3 @@ Este módulo não inclui pré-requisitos para a aprovação de financiamentos, g
    - HTTP.jl  
    - JSON3.jl  
    - PostgreSQL.jl  
-
-### Passos de Configuração  
-1. Clone este repositório:  
-   ```bash
-   git clone https://github.com/seuusuario/oxebanking-financiamentos.git
-   cd oxebanking-financiamentos
