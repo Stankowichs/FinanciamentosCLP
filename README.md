@@ -19,6 +19,14 @@ Este módulo não inclui pré-requisitos para a aprovação de financiamentos, g
 
 ---
 
+📚 Parte do Projeto OxeBanking
+O OxeBanking é um projeto colaborativo multidisciplinar que abrange diversas linguagens de programação para simular um banco completo.
+
+Objetivo: Demonstrar a integração de linguagens e ferramentas para construir um sistema bancário funcional.
+Estrutura: Cada funcionalidade, como controle de contas, transações e financiamentos, é desenvolvida em uma linguagem de programação diferente.
+Este Módulo: Utiliza Julia para o controle básico de financiamentos, focando em APIs REST locais e integração com PostgreSQL.
+
+
 ## ⚙️ **Configuração**
 
 ### Pré-requisitos  
